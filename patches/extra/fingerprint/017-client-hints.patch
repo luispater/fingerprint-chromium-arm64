@@ -1,0 +1,109 @@
+diff --git a/third_party/blink/common/user_agent/user_agent_metadata.cc b/third_party/blink/common/user_agent/user_agent_metadata.cc
+index 3bcd29aa4d..01ad8eb056 100644
+--- a/third_party/blink/common/user_agent/user_agent_metadata.cc
++++ b/third_party/blink/common/user_agent/user_agent_metadata.cc
+@@ -219,6 +219,38 @@ void UpdateUserAgentMetadataFingerprint(blink::UserAgentMetadata* metadata) {
+   std::string version;
+   std::string main_version;
+ 
++  // 查找原列表中的 Not-A.Brand 信息
++  std::string not_a_brand = "Not-A.Brand";
++  std::string not_a_brand_version = "8";
++  std::string not_a_brand_full_version = "8.0.0.0";
++
++  for (const auto& brand : metadata->brand_version_list) {
++    if (brand.brand.find("Not-") == 0) {
++      not_a_brand = brand.brand;
++      not_a_brand_version = brand.version;
++      not_a_brand_full_version = not_a_brand_version + ".0.0.0";
++      break;
++    }
++  }
++  
++  // 保存 Chromium 信息
++  std::string chromium_main_version = "";
++  std::string chromium_version = "";
++  
++  for (const auto& brand : metadata->brand_version_list) {
++    if (brand.brand == "Chromium") {
++      chromium_main_version = brand.version;
++      break;
++    }
++  }
++  
++  for (const auto& brand : metadata->brand_full_version_list) {
++    if (brand.brand == "Chromium") {
++      chromium_version = brand.version;
++      break;
++    }
++  }
++
+   if (command_line->HasSwitch(switches::kFingerprintBrand)) {
+     std::string custom_brand = command_line->GetSwitchValueASCII(switches::kFingerprintBrand);
+     std::string custom_version = command_line->HasSwitch(switches::kFingerprintBrandVersion)
+@@ -229,21 +261,8 @@ void UpdateUserAgentMetadataFingerprint(blink::UserAgentMetadata* metadata) {
+       // Chrome需要改变Chromium的版本号，否则会导致版本号不匹配
+       display_brand = "Google Chrome";
+       version = custom_version.empty()? metadata->full_version : custom_version;
+-      main_version = version.substr(0, version.find('.'));
+-
+-      for (auto& brand_full_version : metadata->brand_full_version_list) {
+-        if (brand_full_version.brand == "Chromium") {
+-          brand_full_version.version = version;
+-          break;
+-        }
+-      }
+-
+-      for (auto& brand : metadata->brand_version_list) {
+-        if (brand.brand == "Chromium") {
+-          brand.version = main_version;
+-          break;
+-        }
+-      }
++      // 更新 Chromium 版本号以匹配
++      chromium_version = version;
+     } else if (custom_brand == "Edge") {
+       display_brand = "Microsoft Edge";
+       version = custom_version.empty() ? "135.0.3179.98" : custom_version;
+@@ -257,16 +276,38 @@ void UpdateUserAgentMetadataFingerprint(blink::UserAgentMetadata* metadata) {
+       display_brand = custom_brand;
+       version = custom_version.empty() ? metadata->full_version : custom_version;
+     }
+-    main_version = version.substr(0, version.find('.'));
+   } else {
+     display_brand = "Google Chrome";
+     version = metadata->full_version;
+-    main_version = metadata->full_version.substr(0, metadata->full_version.find('.'));
+   }
+ 
+-  // Add brand information to metadata
++  // 提取主版本号（只计算一次）
++  main_version = version.substr(0, version.find('.'));
++  
++  // 如果是Chrome，更新Chromium的主版本号
++  if (display_brand == "Google Chrome") {
++    chromium_main_version = main_version;
++  }
++
++  // 重要: 重建品牌顺序列表
++  metadata->brand_version_list.clear();
++  metadata->brand_full_version_list.clear();
++  
++  // 1. 首先添加自定义品牌或默认的 Chrome
+   metadata->brand_version_list.push_back({display_brand, main_version});
+   metadata->brand_full_version_list.push_back({display_brand, version});
++  
++  // 2. 然后添加 Not-A.Brand
++  metadata->brand_version_list.push_back({not_a_brand, not_a_brand_version});
++  metadata->brand_full_version_list.push_back({not_a_brand, not_a_brand_full_version});
++  
++  // 3. 最后添加 Chromium
++  metadata->brand_version_list.push_back({"Chromium", chromium_main_version});
++  metadata->brand_full_version_list.push_back({"Chromium", chromium_version});
++
++  // Chrome 135顺序: Google Chrome, Not-A.Brand, Chromium
++  
++  // 更新主版本号
+   metadata->full_version = version;
+ 
+   // Handle platform information

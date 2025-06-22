@@ -1,0 +1,1215 @@
+# Contains tests and features that are unneeded and would otherwise
+# require binaries to be whitelisted in the pruning list
+
+--- a/chrome/BUILD.gn
++++ b/chrome/BUILD.gn
+@@ -370,7 +370,6 @@ if (!is_android && !is_mac) {
+     data_deps += [
+       "//chrome/browser/resources/media/mei_preload:component",
+       "//chrome/browser/web_applications/isolated_web_apps/key_distribution/preload:component",
+-      "//components/privacy_sandbox/privacy_sandbox_attestations/preload:component",
+       "//third_party/widevine/cdm",
+     ]
+ 
+@@ -929,8 +928,6 @@ if (is_win) {
+ 
+   bundle_data("chrome_framework_resources") {
+     sources = [
+-      "//ui/gl/resources/angle-metal/gpu_shader_cache.bin",
+-
+       # This image is used to badge the lock icon in the
+       # authentication dialogs, such as those used for installation
+       # from disk image and Keystone promotion (if so enabled).  It
+@@ -1203,7 +1200,6 @@ if (is_win) {
+       ":widevine_cdm_library",
+       "//chrome/browser/resources/media/mei_preload:component_bundle",
+       "//chrome/browser/web_applications/isolated_web_apps/key_distribution/preload:component_bundle",
+-      "//components/privacy_sandbox/privacy_sandbox_attestations/preload:component_bundle",
+     ]
+ 
+     if (is_chrome_branded) {
+--- a/chrome/browser/BUILD.gn
++++ b/chrome/browser/BUILD.gn
+@@ -755,10 +755,6 @@ static_library("browser") {
+     "navigation_predictor/navigation_predictor_metrics_document_data.h",
+     "navigation_predictor/navigation_predictor_preconnect_client.cc",
+     "navigation_predictor/navigation_predictor_preconnect_client.h",
+-    "navigation_predictor/preloading_model_keyed_service.cc",
+-    "navigation_predictor/preloading_model_keyed_service.h",
+-    "navigation_predictor/preloading_model_keyed_service_factory.cc",
+-    "navigation_predictor/preloading_model_keyed_service_factory.h",
+     "net/cert_verifier_service_time_updater.cc",
+     "net/cert_verifier_service_time_updater.h",
+     "net/chrome_mojo_proxy_resolver_factory.cc",
+@@ -3514,10 +3510,6 @@ static_library("browser") {
+   } else {
+     #!is_android
+     sources += [
+-      "accessibility/ax_main_node_annotator_controller.cc",
+-      "accessibility/ax_main_node_annotator_controller.h",
+-      "accessibility/ax_main_node_annotator_controller_factory.cc",
+-      "accessibility/ax_main_node_annotator_controller_factory.h",
+       "accessibility/caption_bubble_context_browser.h",
+       "accessibility/embedded_a11y_extension_loader.cc",
+       "accessibility/embedded_a11y_extension_loader.h",
+@@ -4250,10 +4242,6 @@ static_library("browser") {
+       "//chrome/browser/new_tab_page/chrome_colors",
+       "//chrome/browser/policy:path_parser",
+       "//chrome/browser/resources:component_extension_resources",
+-      "//chrome/browser/screen_ai:prefs",
+-      "//chrome/browser/screen_ai:screen_ai_install_state",
+-      "//chrome/browser/screen_ai:screen_ai_service_router_factory",
+-      "//chrome/browser/screen_ai/public:optical_character_recognizer",
+       "//chrome/browser/search/background",
+       "//chrome/browser/smart_card",
+       "//chrome/browser/themes",
+@@ -4378,9 +4366,6 @@ static_library("browser") {
+       "//components/webauthn/core/browser",
+       "//components/webauthn/core/browser:passkey_model",
+       "//services/device/public/cpp/hid",
+-      "//services/screen_ai",
+-      "//services/screen_ai/public/cpp:utilities",
+-      "//services/screen_ai/public/mojom",
+       "//third_party/crashpad/crashpad/client:common",
+       "//third_party/zxcvbn-cpp",
+       "//ui/views",
+@@ -4475,8 +4460,6 @@ static_library("browser") {
+       sources += [
+         "accessibility/soda_installer_impl.cc",
+         "accessibility/soda_installer_impl.h",
+-        "component_updater/screen_ai_component_installer.cc",
+-        "component_updater/screen_ai_component_installer.h",
+         "device_identity/device_oauth2_token_store_desktop.cc",
+         "device_identity/device_oauth2_token_store_desktop.h",
+         "device_notifications/device_status_icon_renderer.cc",
+@@ -4515,8 +4498,6 @@ static_library("browser") {
+         "profiles/profile_activity_metrics_recorder.h",
+         "profiles/profile_list_desktop.cc",
+         "profiles/profile_list_desktop.h",
+-        "screen_ai/screen_ai_downloader_non_chromeos.cc",
+-        "screen_ai/screen_ai_downloader_non_chromeos.h",
+         "signin/force_signin_verifier.cc",
+         "signin/force_signin_verifier.h",
+         "signin/signin_manager.cc",
+@@ -5317,7 +5298,6 @@ static_library("browser") {
+       "//chrome/browser/policy:system_features_disable_list",
+       "//chrome/browser/push_notification:push_notification",
+       "//chrome/browser/resources:app_icon_resources",
+-      "//chrome/browser/screen_ai:screen_ai_dlc_installer",
+       "//chrome/browser/support_tool/ash",
+       "//chrome/browser/ui/ash/accelerator",
+       "//chrome/browser/ui/ash/accessibility",
+@@ -5581,7 +5561,6 @@ static_library("browser") {
+       "//remoting/host/chromeos:browser_interop",
+       "//remoting/host/chromeos:features",
+       "//services/device/public/cpp/geolocation",
+-      "//services/screen_ai/public/cpp:metrics",
+       "//third_party/nearby:rpc_resources_proto",
+       "//third_party/nearby:wire_format_proto",
+       "//ui/chromeos",
+@@ -7803,12 +7782,6 @@ static_library("browser") {
+   }
+ 
+   if (enable_pdf) {
+-    sources += [
+-      "accessibility/pdf_ocr_controller.cc",
+-      "accessibility/pdf_ocr_controller.h",
+-      "accessibility/pdf_ocr_controller_factory.cc",
+-      "accessibility/pdf_ocr_controller_factory.h",
+-    ]
+     deps += [
+       "//chrome/browser/pdf",
+       "//chrome/browser/pdf:pdf_pref_names",
+--- a/chrome/browser/browser_process_impl.cc
++++ b/chrome/browser/browser_process_impl.cc
+@@ -249,12 +249,10 @@
+ #if BUILDFLAG(IS_CHROMEOS)
+ #include "chrome/browser/chromeos/extensions/telemetry/chromeos_telemetry_extensions_browser_api_provider.h"
+ #include "chrome/browser/hid/hid_pinned_notification.h"
+-#include "chrome/browser/screen_ai/screen_ai_downloader_chromeos.h"
+ #include "chrome/browser/usb/usb_pinned_notification.h"
+ #include "components/crash/core/app/crashpad.h"
+ #elif !BUILDFLAG(IS_ANDROID)
+ #include "chrome/browser/hid/hid_status_icon.h"
+-#include "chrome/browser/screen_ai/screen_ai_downloader_non_chromeos.h"
+ #include "chrome/browser/usb/usb_status_icon.h"
+ #include "components/enterprise/browser/controller/chrome_browser_cloud_management_controller.h"
+ #endif
+@@ -1347,9 +1345,6 @@ void BrowserProcessImpl::PreMainMessageL
+   soda_installer_impl_ = std::make_unique<speech::SodaInstallerImplChromeOS>();
+ #endif  // BUILDFLAG(IS_CHROMEOS)
+ 
+-#if !BUILDFLAG(IS_ANDROID)
+-  screen_ai_download_ = screen_ai::ScreenAIInstallState::Create();
+-#endif
+ 
+   base::FilePath user_data_dir;
+   bool result = base::PathService::Get(chrome::DIR_USER_DATA, &user_data_dir);
+--- a/chrome/browser/browser_process_impl.h
++++ b/chrome/browser/browser_process_impl.h
+@@ -92,9 +92,6 @@ namespace speech {
+ class SodaInstaller;
+ }  // namespace speech
+ 
+-namespace screen_ai {
+-class ScreenAIInstallState;
+-}  // namespace screen_ai
+ 
+ // Real implementation of BrowserProcess that creates and returns the services.
+ class BrowserProcessImpl : public BrowserProcess,
+@@ -431,9 +428,6 @@ class BrowserProcessImpl : public Browse
+   // to ensure that SodaInstallerImpl gets destructed first.
+   std::unique_ptr<speech::SodaInstaller> soda_installer_impl_;
+ 
+-  // Used to download Screen AI on demand and keep track of the library
+-  // availability.
+-  std::unique_ptr<screen_ai::ScreenAIInstallState> screen_ai_download_;
+ #endif
+ 
+   std::unique_ptr<BrowserProcessPlatformPart> platform_part_;
+--- a/chrome/browser/chrome_browser_interface_binders.cc
++++ b/chrome/browser/chrome_browser_interface_binders.cc
+@@ -78,8 +78,6 @@
+ 
+ #if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || \
+     BUILDFLAG(IS_CHROMEOS)
+-#include "chrome/browser/screen_ai/screen_ai_service_router.h"
+-#include "chrome/browser/screen_ai/screen_ai_service_router_factory.h"
+ #include "chrome/browser/ui/web_applications/sub_apps_service_impl.h"
+ #endif
+ 
+@@ -357,27 +355,6 @@ void BindMediaFoundationPreferences(
+ }
+ #endif  // BUILDFLAG(IS_WIN)
+ 
+-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || \
+-    BUILDFLAG(IS_WIN)
+-void BindScreenAIAnnotator(
+-    content::RenderFrameHost* frame_host,
+-    mojo::PendingReceiver<screen_ai::mojom::ScreenAIAnnotator> receiver) {
+-  content::BrowserContext* browser_context =
+-      frame_host->GetProcess()->GetBrowserContext();
+-
+-  screen_ai::ScreenAIServiceRouterFactory::GetForBrowserContext(browser_context)
+-      ->BindScreenAIAnnotator(std::move(receiver));
+-}
+-
+-void BindScreen2xMainContentExtractor(
+-    content::RenderFrameHost* frame_host,
+-    mojo::PendingReceiver<screen_ai::mojom::Screen2xMainContentExtractor>
+-        receiver) {
+-  screen_ai::ScreenAIServiceRouterFactory::GetForBrowserContext(
+-      frame_host->GetProcess()->GetBrowserContext())
+-      ->BindMainContentExtractor(std::move(receiver));
+-}
+-#endif
+ 
+ }  // namespace
+ 
+@@ -510,11 +487,6 @@ void PopulateChromeFrameBinders(
+         base::BindRepeating(&web_app::SubAppsServiceImpl::CreateIfAllowed));
+   }
+ 
+-  map->Add<screen_ai::mojom::ScreenAIAnnotator>(
+-      base::BindRepeating(&BindScreenAIAnnotator));
+-
+-  map->Add<screen_ai::mojom::Screen2xMainContentExtractor>(
+-      base::BindRepeating(&BindScreen2xMainContentExtractor));
+ #endif
+ 
+ #if BUILDFLAG(IS_WIN)
+--- a/chrome/browser/component_updater/registration.cc
++++ b/chrome/browser/component_updater/registration.cc
+@@ -72,8 +72,6 @@
+ 
+ #if BUILDFLAG(IS_ANDROID)
+ #include "chrome/browser/component_updater/real_time_url_checks_allowlist_component_installer.h"
+-#else
+-#include "chrome/browser/component_updater/screen_ai_component_installer.h"
+ #endif  // BUILDFLAG(IS_ANDROID)
+ 
+ #if !BUILDFLAG(IS_ANDROID)
+@@ -237,9 +235,6 @@ void RegisterComponentsForUpdate() {
+ 
+   RegisterAutofillStatesComponent(cus, g_browser_process->local_state());
+ 
+-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_CHROMEOS)
+-  ManageScreenAIComponentRegistration(cus, g_browser_process->local_state());
+-#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_CHROMEOS)
+ 
+   RegisterCommerceHeuristicsComponent(cus);
+ 
+--- a/chrome/browser/navigation_predictor/navigation_predictor.cc
++++ b/chrome/browser/navigation_predictor/navigation_predictor.cc
+@@ -17,8 +17,6 @@
+ #include "base/time/default_tick_clock.h"
+ #include "chrome/browser/navigation_predictor/navigation_predictor_keyed_service.h"
+ #include "chrome/browser/navigation_predictor/navigation_predictor_keyed_service_factory.h"
+-#include "chrome/browser/navigation_predictor/preloading_model_keyed_service.h"
+-#include "chrome/browser/navigation_predictor/preloading_model_keyed_service_factory.h"
+ #include "chrome/browser/preloading/preloading_prefs.h"
+ #include "chrome/browser/profiles/profile.h"
+ #include "components/no_state_prefetch/browser/no_state_prefetch_manager.h"
+@@ -105,10 +103,6 @@ base::TimeDelta MLModelExecutionTimerSta
+       blink::features::kPreloadingModelTimerStartDelay.Get());
+ }
+ 
+-base::TimeDelta MLModelExecutionTimerInterval() {
+-  return base::Milliseconds(
+-      blink::features::kPreloadingModelTimerInterval.Get());
+-}
+ 
+ base::TimeDelta MLModelMaxHoverTime() {
+   return blink::features::kPreloadingModelMaxHoverTime.Get();
+@@ -415,80 +409,6 @@ void NavigationPredictor::ProcessPointer
+ }
+ 
+ void NavigationPredictor::OnMLModelExecutionTimerFired() {
+-  // Check whether preloading is enabled or not.
+-  Profile* profile =
+-      Profile::FromBrowserContext(render_frame_host().GetBrowserContext());
+-  if (prefetch::IsSomePreloadingEnabled(*profile->GetPrefs()) !=
+-      content::PreloadingEligibility::kEligible) {
+-    return;
+-  }
+-
+-  // Execute the model.
+-  PreloadingModelKeyedService* model_service =
+-      PreloadingModelKeyedServiceFactory::GetForProfile(profile);
+-  if (!model_service) {
+-    return;
+-  }
+-
+-  if (!ml_model_candidate_.has_value()) {
+-    return;
+-  }
+-  auto it = anchors_.find(ml_model_candidate_.value());
+-  if (it == anchors_.end()) {
+-    return;
+-  }
+-
+-  AnchorElementData& anchor = it->second;
+-
+-  PreloadingModelKeyedService::Inputs inputs;
+-  inputs.contains_image = anchor.contains_image;
+-  inputs.font_size = anchor.font_size;
+-  inputs.has_text_sibling = anchor.has_text_sibling;
+-  inputs.is_bold = anchor.is_bold_font;
+-  inputs.is_in_iframe = anchor.is_in_iframe;
+-  inputs.is_url_incremented_by_one = anchor.is_url_incremented_by_one;
+-  inputs.navigation_start_to_link_logged =
+-      anchor.first_report_timestamp - navigation_start_;
+-  auto path_info = GetUrlPathLengthDepthAndHash(anchor.target_url);
+-  inputs.path_length = path_info.path_length;
+-  inputs.path_depth = path_info.path_depth;
+-  inputs.percent_clickable_area = anchor.ratio_area;
+-  inputs.percent_vertical_distance =
+-      static_cast<int>(anchor.ratio_distance_root_top * 100);
+-
+-  inputs.is_same_host = anchor.is_same_host;
+-  auto to_timedelta = [this](std::optional<base::TimeTicks> ts) {
+-    return ts.has_value() ? NowTicks() - ts.value() : base::TimeDelta();
+-  };
+-  // TODO(329691634): Using the real viewport entry time for
+-  // `entered_viewport_to_left_viewport` produces low quality results.
+-  // We could remove it from the model, if we can't get this to be useful.
+-  inputs.entered_viewport_to_left_viewport = base::TimeDelta();
+-  inputs.hover_dwell_time = to_timedelta(anchor.pointer_over_timestamp);
+-  inputs.pointer_hovering_over_count = anchor.pointer_hovering_over_count;
+-  if (model_score_callback_) {
+-    std::move(model_score_callback_).Run(inputs);
+-  }
+-
+-  content::PreloadingData* preloading_data =
+-      content::PreloadingData::GetOrCreateForWebContents(
+-          content::WebContents::FromRenderFrameHost(&render_frame_host()));
+-  preloading_data->OnPreloadingHeuristicsModelInput(
+-      anchor.target_url,
+-      base::BindOnce(&RecordMetricsForModelTraining, inputs,
+-                     render_frame_host().GetPageUkmSourceId()));
+-  model_service->Score(
+-      &scoring_model_task_tracker_, inputs,
+-      base::BindOnce(&NavigationPredictor::OnPreloadingHeuristicsModelDone,
+-                     weak_ptr_factory_.GetWeakPtr(), anchor.target_url));
+-
+-  if (inputs.hover_dwell_time < MLModelMaxHoverTime() &&
+-      !ml_model_execution_timer_.IsRunning()) {
+-    ml_model_execution_timer_.Start(
+-        FROM_HERE, MLModelExecutionTimerInterval(),
+-        base::BindOnce(&NavigationPredictor::OnMLModelExecutionTimerFired,
+-                       base::Unretained(this)));
+-  }
+ }
+ 
+ void NavigationPredictor::SetModelScoreCallbackForTesting(
+--- a/chrome/browser/pdf/pdf_extension_util.cc
++++ b/chrome/browser/pdf/pdf_extension_util.cc
+@@ -104,7 +104,6 @@ void AddPdfViewerStrings(base::Value::Di
+       {"rotationStateLabel90", IDS_PDF_ROTATION_STATE_LABEL_90},
+       {"rotationStateLabel180", IDS_PDF_ROTATION_STATE_LABEL_180},
+       {"rotationStateLabel270", IDS_PDF_ROTATION_STATE_LABEL_270},
+-      {"searchifyInProgress", IDS_PDF_SEARCHIFY_IN_PROGRESS},
+       {"thumbnailPageAriaLabel", IDS_PDF_THUMBNAIL_PAGE_ARIA_LABEL},
+       {"tooltipAttachments", IDS_PDF_TOOLTIP_ATTACHMENTS},
+       {"tooltipDocumentOutline", IDS_PDF_TOOLTIP_DOCUMENT_OUTLINE},
+--- a/chrome/browser/permissions/prediction_based_permission_ui_selector.cc
++++ b/chrome/browser/permissions/prediction_based_permission_ui_selector.cc
+@@ -281,21 +281,6 @@ void PredictionBasedPermissionUiSelector
+     if (inner_text.size() > kPageContentMaxLength) {
+       inner_text.resize(kPageContentMaxLength);
+     }
+-    if (PredictionModelHandlerProvider* prediction_model_handler_provider =
+-            PredictionModelHandlerProviderFactory::GetForBrowserContext(
+-                profile_)) {
+-      if (PermissionsAiHandler* gen_ai_model_handler =
+-              prediction_model_handler_provider->GetPermissionsAiHandler()) {
+-        VLOG(1) << "[PermissionsAIv1] Inquire model.";
+-        gen_ai_model_handler->InquireAiOnDeviceModel(
+-            std::move(inner_text), request_type,
+-            base::BindRepeating(&PredictionBasedPermissionUiSelector::
+-                                    AiOnDeviceModelExecutionCallback,
+-                                weak_ptr_factory_.GetWeakPtr(),
+-                                std::move(features), request_type));
+-        return;
+-      }
+-    }
+     VLOG(1) << "[PermissionsAIv1] On device AI model session unavailable";
+   } else {
+     VLOG(1) << "[PermissionsAIv1] The page's contnet too short or empty";
+--- a/chrome/browser/prefs/BUILD.gn
++++ b/chrome/browser/prefs/BUILD.gn
+@@ -266,7 +266,6 @@ source_set("impl") {
+   } else {
+     deps += [
+       "//chrome/browser/promos:utils",
+-      "//chrome/browser/screen_ai:prefs",
+       "//chrome/browser/search/background",
+       "//chrome/browser/search_engine_choice",
+       "//chrome/browser/search_engines",
+--- a/chrome/browser/prefs/browser_prefs.cc
++++ b/chrome/browser/prefs/browser_prefs.cc
+@@ -1793,9 +1793,6 @@ void RegisterLocalState(PrefRegistrySimp
+   DeviceOAuth2TokenStoreDesktop::RegisterPrefs(registry);
+ #endif
+ 
+-#if !BUILDFLAG(IS_ANDROID)
+-  screen_ai::RegisterLocalStatePrefs(registry);
+-#endif  // !BUILDFLAG(IS_ANDROID)
+ 
+ #if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+   PlatformAuthPolicyObserver::RegisterPrefs(registry);
+--- a/chrome/browser/profiles/BUILD.gn
++++ b/chrome/browser/profiles/BUILD.gn
+@@ -301,7 +301,6 @@ source_set("profiles_extra_parts_impl")
+       "//chrome/browser/feedback",
+       "//chrome/browser/hid",
+       "//chrome/browser/media/router/discovery/access_code:access_code_sink_service",
+-      "//chrome/browser/screen_ai:screen_ai_service_router_factory",
+       "//chrome/browser/search",
+       "//chrome/browser/search/background",
+       "//chrome/browser/search_engine_choice",
+--- a/chrome/browser/profiles/chrome_browser_main_extra_parts_profiles.cc
++++ b/chrome/browser/profiles/chrome_browser_main_extra_parts_profiles.cc
+@@ -98,7 +98,6 @@
+ #include "chrome/browser/media_galleries/media_galleries_preferences_factory.h"
+ #include "chrome/browser/metrics/variations/google_groups_manager_factory.h"
+ #include "chrome/browser/navigation_predictor/navigation_predictor_keyed_service_factory.h"
+-#include "chrome/browser/navigation_predictor/preloading_model_keyed_service_factory.h"
+ #include "chrome/browser/net/dns_probe_service_factory.h"
+ #include "chrome/browser/net/profile_network_context_service_factory.h"
+ #include "chrome/browser/notifications/metrics/notification_metrics_logger_factory.h"
+@@ -314,7 +313,6 @@
+ #include "chrome/browser/performance_manager/persistence/site_data/site_data_cache_facade_factory.h"
+ #include "chrome/browser/privacy_sandbox/privacy_sandbox_survey_desktop_controller_factory.h"
+ #include "chrome/browser/profile_resetter/reset_report_uploader_factory.h"
+-#include "chrome/browser/screen_ai/screen_ai_service_router_factory.h"
+ #include "chrome/browser/search/background/ntp_background_service_factory.h"
+ #include "chrome/browser/search/background/ntp_custom_background_service_factory.h"
+ #include "chrome/browser/search/instant_service_factory.h"
+@@ -995,7 +993,6 @@ void ChromeBrowserMainExtraPartsProfiles
+ #if BUILDFLAG(CHROME_ROOT_STORE_CERT_MANAGEMENT_UI)
+   net::ServerCertificateDatabaseServiceFactory::GetInstance();
+ #endif
+-  PreloadingModelKeyedServiceFactory::GetInstance();
+ #if BUILDFLAG(IS_CHROMEOS)
+   NearbySharingServiceFactory::GetInstance();
+   if (base::FeatureList::IsEnabled(ash::features::kNearbyPresence)) {
+@@ -1047,9 +1044,6 @@ void ChromeBrowserMainExtraPartsProfiles
+   OneTimePermissionsTrackerFactory::GetInstance();
+ #endif
+   OpenerHeuristicServiceFactory::GetInstance();
+-  if (optimization_guide::ShouldStartModelValidator()) {
+-    optimization_guide::ModelValidatorKeyedServiceFactory::GetInstance();
+-  }
+   OptimizationGuideKeyedServiceFactory::GetInstance();
+   OriginKeyedPermissionActionServiceFactory::GetInstance();
+   OriginTrialsFactory::GetInstance();
+@@ -1113,13 +1107,6 @@ void ChromeBrowserMainExtraPartsProfiles
+   policy::UserPolicySigninServiceFactory::GetInstance();
+ #endif
+   PolicyBlocklistFactory::GetInstance();
+-  if (base::FeatureList::IsEnabled(
+-          permissions::features::kPermissionOnDeviceNotificationPredictions) ||
+-      base::FeatureList::IsEnabled(
+-          permissions::features::kPermissionOnDeviceGeolocationPredictions) ||
+-      base::FeatureList::IsEnabled(permissions::features::kPermissionsAIv1)) {
+-    PredictionModelHandlerProviderFactory::GetInstance();
+-  }
+   PredictionServiceFactory::GetInstance();
+   predictors::AutocompleteActionPredictorFactory::GetInstance();
+   predictors::LoadingPredictorFactory::GetInstance();
+@@ -1205,13 +1192,6 @@ void ChromeBrowserMainExtraPartsProfiles
+ #else
+   SafetyHubMenuNotificationServiceFactory::GetInstance();
+   SafetyHubHatsServiceFactory::GetInstance();
+-  if (features::IsMainNodeAnnotationsEnabled()) {
+-    screen_ai::AXMainNodeAnnotatorControllerFactory::GetInstance();
+-  }
+-#if BUILDFLAG(ENABLE_PDF)
+-  screen_ai::PdfOcrControllerFactory::GetInstance();
+-#endif
+-  screen_ai::ScreenAIServiceRouterFactory::EnsureFactoryBuilt();
+ #endif
+ #if BUILDFLAG(IS_CHROMEOS)
+   if (ash::features::IsScannerEnabled()) {
+--- a/chrome/browser/profiles/profile_impl.cc
++++ b/chrome/browser/profiles/profile_impl.cc
+@@ -846,24 +846,6 @@ void ProfileImpl::DoFinalInit(CreateMode
+   // The password settings service needs to start listening to settings
+   // changes from Google Mobile Services, as early as possible.
+   PasswordManagerSettingsServiceFactory::GetForProfile(this);
+-#else
+-
+-#if BUILDFLAG(ENABLE_PDF)
+-  bool pcf_ocr_may_be_needed = true;
+-#if BUILDFLAG(IS_CHROMEOS)
+-  // `PdfOcrControllerFactory` is not needed in the not-signed-in profile of
+-  // ChromeOS as no user navigation to PDFs is possible there.
+-  pcf_ocr_may_be_needed = IsSignedIn();
+-#endif
+-  // Create the PDF OCR controller so that it can self-activate as needed.
+-  if (pcf_ocr_may_be_needed) {
+-    screen_ai::PdfOcrControllerFactory::GetForProfile(this);
+-  }
+-#endif  // BUILDFLAG(ENABLE_PDF)
+-
+-  if (features::IsMainNodeAnnotationsEnabled()) {
+-    screen_ai::AXMainNodeAnnotatorControllerFactory::GetForProfile(this);
+-  }
+ #endif  // BUILDFLAG(IS_ANDROID)
+ 
+   // The announcement notification  service might not be available for some
+--- a/chrome/browser/profiles/profile_manager.cc
++++ b/chrome/browser/profiles/profile_manager.cc
+@@ -50,7 +50,6 @@
+ #include "chrome/browser/extensions/chrome_content_browser_client_extensions_part.h"
+ #include "chrome/browser/lifetime/application_lifetime.h"
+ #include "chrome/browser/navigation_predictor/navigation_predictor_keyed_service_factory.h"
+-#include "chrome/browser/navigation_predictor/preloading_model_keyed_service_factory.h"
+ #include "chrome/browser/prefs/incognito_mode_prefs.h"
+ #include "chrome/browser/profiles/delete_profile_helper.h"
+ #include "chrome/browser/profiles/keep_alive/profile_keep_alive_types.h"
+@@ -1507,9 +1506,6 @@ void ProfileManager::DoFinalInitForServi
+   // Ensure NavigationPredictorKeyedService is started.
+   NavigationPredictorKeyedServiceFactory::GetForProfile(profile);
+ 
+-  // Ensure PreloadingModelKeyedService is started.
+-  PreloadingModelKeyedServiceFactory::GetForProfile(profile);
+-
+   IdentityManagerFactory::GetForProfile(profile)->OnNetworkInitialized();
+   AccountReconcilorFactory::GetForProfile(profile);
+ #if BUILDFLAG(IS_ANDROID)
+--- a/chrome/browser/resources/BUILD.gn
++++ b/chrome/browser/resources/BUILD.gn
+@@ -90,7 +90,6 @@ group("resources") {
+   if (is_mac) {
+     public_deps += [
+       "//chrome/browser/resources/media/mei_preload:component",
+-      "//components/privacy_sandbox/privacy_sandbox_attestations/preload:component",
+     ]
+   }
+ 
+--- a/chrome/browser/resources/pdf/pdf_viewer.html
++++ b/chrome/browser/resources/pdf/pdf_viewer.html
+@@ -91,10 +91,6 @@
+             @current-type-changed="${this.onBrushTypeChanged_}">
+       </viewer-side-panel>` : ''}
+   </if>
+-  <cr-toast id="searchifyProgress">
+-    <div class="spinner"></div>
+-    <span>$i18n{searchifyInProgress}</span>
+-  </cr-toast>
+ </div>
+ 
+ ${this.showErrorDialog ? html`<viewer-error-dialog id="error-dialog">
+--- a/chrome/browser/ui/BUILD.gn
++++ b/chrome/browser/ui/BUILD.gn
+@@ -1703,8 +1703,6 @@ static_library("ui") {
+       "//chrome/browser/reading_list",
+       "//chrome/browser/safe_browsing",
+       "//chrome/browser/safe_browsing:advanced_protection",
+-      "//chrome/browser/screen_ai:screen_ai_install_state",
+-      "//chrome/browser/screen_ai:screen_ai_service_router_factory",
+       "//chrome/browser/smart_card:smart_card",
+       "//chrome/browser/tab_group_sync:utils",
+       "//chrome/browser/themes",
+@@ -2373,7 +2371,6 @@ static_library("ui") {
+       "//chrome/browser/policy:onc",
+       "//chrome/browser/policy:system_features_disable_list",
+       "//chrome/browser/push_notification:push_notification",
+-      "//chrome/browser/screen_ai/public:optical_character_recognizer",
+       "//chrome/browser/ui/ash/accessibility",
+       "//chrome/browser/ui/ash/app_access",
+       "//chrome/browser/ui/ash/arc",
+--- a/chrome/browser/ui/pdf/BUILD.gn
++++ b/chrome/browser/ui/pdf/BUILD.gn
+@@ -6,7 +6,6 @@ import("//pdf/features.gni")
+ import("//services/screen_ai/buildflags/features.gni")
+ 
+ assert(enable_pdf)
+-assert(enable_screen_ai_service)
+ 
+ source_set("pdf") {
+   sources = [
+@@ -16,7 +15,6 @@ source_set("pdf") {
+   deps = [
+     "//chrome/browser/download",
+     "//chrome/browser/pdf",
+-    "//chrome/browser/screen_ai:screen_ai_install_state",
+     "//chrome/browser/ui/tab_contents",
+     "//chrome/browser/ui/user_education",
+     "//chrome/common",
+--- a/chrome/browser/ui/pdf/chrome_pdf_document_helper_client.cc
++++ b/chrome/browser/ui/pdf/chrome_pdf_document_helper_client.cc
+@@ -97,10 +97,4 @@ void ChromePDFDocumentHelperClient::SetP
+ 
+ void ChromePDFDocumentHelperClient::OnSearchifyStarted(
+     content::WebContents* contents) {
+-  // TODO(crbug.com/360803943): Add test.
+-  // Show the promo only when ScreenAI component is available and OCR can be
+-  // done.
+-  if (screen_ai::ScreenAIInstallState::GetInstance()->IsComponentAvailable()) {
+-    MaybeShowFeaturePromo(contents);
+-  }
+ }
+--- a/chrome/browser/ui/webui/settings/accessibility_main_handler.cc
++++ b/chrome/browser/ui/webui/settings/accessibility_main_handler.cc
+@@ -35,11 +35,6 @@ void AccessibilityMainHandler::RegisterM
+       base::BindRepeating(
+           &AccessibilityMainHandler::HandleCheckAccessibilityImageLabels,
+           base::Unretained(this)));
+-  web_ui()->RegisterMessageCallback(
+-      "getScreenAiInstallState",
+-      base::BindRepeating(
+-          &AccessibilityMainHandler::HandleGetScreenAIInstallState,
+-          base::Unretained(this)));
+ }
+ 
+ void AccessibilityMainHandler::OnJavascriptAllowed() {
+@@ -50,11 +45,6 @@ void AccessibilityMainHandler::OnJavascr
+           base::Unretained(this)));
+ #endif  // BUILDFLAG(IS_CHROMEOS)
+ 
+-  if (features::IsMainNodeAnnotationsEnabled()) {
+-    CHECK(!component_ready_observer_.IsObserving());
+-    component_ready_observer_.Observe(
+-        screen_ai::ScreenAIInstallState::GetInstance());
+-  }
+ }
+ 
+ void AccessibilityMainHandler::OnJavascriptDisallowed() {
+@@ -62,35 +52,6 @@ void AccessibilityMainHandler::OnJavascr
+   accessibility_subscription_ = {};
+ #endif  // BUILDFLAG(IS_CHROMEOS)
+ 
+-  if (features::IsMainNodeAnnotationsEnabled()) {
+-    component_ready_observer_.Reset();
+-  }
+-}
+-
+-void AccessibilityMainHandler::DownloadProgressChanged(double progress) {
+-  CHECK_GE(progress, 0.0);
+-  CHECK_LE(progress, 1.0);
+-  const int progress_num = progress * 100;
+-  FireWebUIListener("screen-ai-downloading-progress-changed",
+-                    base::Value(progress_num));
+-}
+-
+-void AccessibilityMainHandler::StateChanged(
+-    screen_ai::ScreenAIInstallState::State state) {
+-  base::Value state_value = base::Value(static_cast<int>(state));
+-  FireWebUIListener("screen-ai-state-changed", state_value);
+-}
+-
+-void AccessibilityMainHandler::HandleGetScreenAIInstallState(
+-    const base::Value::List& args) {
+-  CHECK_EQ(1U, args.size());
+-  const base::Value& callback_id = args[0];
+-  AllowJavascript();
+-  // Get the current install state and send it back to a UI callback.
+-  screen_ai::ScreenAIInstallState::State current_install_state =
+-      screen_ai::ScreenAIInstallState::GetInstance()->get_state();
+-  ResolveJavascriptCallback(
+-      callback_id, base::Value(static_cast<int>(current_install_state)));
+ }
+ 
+ void AccessibilityMainHandler::HandleGetScreenReaderState(
+--- a/chrome/browser/ui/webui/settings/accessibility_main_handler.h
++++ b/chrome/browser/ui/webui/settings/accessibility_main_handler.h
+@@ -19,8 +19,7 @@ namespace settings {
+ // Settings handler for the main accessibility settings page,
+ // chrome://settings/accessibility.
+ class AccessibilityMainHandler
+-    : public ::settings::SettingsPageUIHandler,
+-      public screen_ai::ScreenAIInstallState::Observer {
++    : public ::settings::SettingsPageUIHandler {
+  public:
+   AccessibilityMainHandler();
+   ~AccessibilityMainHandler() override;
+@@ -32,9 +31,6 @@ class AccessibilityMainHandler
+   void OnJavascriptAllowed() override;
+   void OnJavascriptDisallowed() override;
+ 
+-  // screen_ai::ScreenAIInstallState::Observer:
+-  void DownloadProgressChanged(double progress) override;
+-  void StateChanged(screen_ai::ScreenAIInstallState::State state) override;
+ 
+  private:
+   void HandleGetScreenReaderState(const base::Value::List& args);
+@@ -51,9 +47,6 @@ class AccessibilityMainHandler
+   base::CallbackListSubscription accessibility_subscription_;
+ #endif  // BUILDFLAG(IS_CHROMEOS)
+ 
+-  base::ScopedObservation<screen_ai::ScreenAIInstallState,
+-                          screen_ai::ScreenAIInstallState::Observer>
+-      component_ready_observer_{this};
+ };
+ 
+ }  // namespace settings
+--- a/chrome/browser/ui/webui/side_panel/read_anything/read_anything_untrusted_page_handler.cc
++++ b/chrome/browser/ui/webui/side_panel/read_anything/read_anything_untrusted_page_handler.cc
+@@ -20,8 +20,6 @@
+ #include "chrome/browser/browser_features.h"
+ #include "chrome/browser/language/language_model_manager_factory.h"
+ #include "chrome/browser/profiles/profile.h"
+-#include "chrome/browser/screen_ai/screen_ai_service_router.h"
+-#include "chrome/browser/screen_ai/screen_ai_service_router_factory.h"
+ #include "chrome/browser/speech/extension_api/tts_engine_extension_api.h"
+ #include "chrome/browser/translate/chrome_translate_client.h"
+ #include "chrome/browser/ui/browser.h"
+@@ -370,24 +368,6 @@ ReadAnythingUntrustedPageHandler::ReadAn
+   prefs_lang = language::ExtractBaseLanguage(prefs_lang);
+   SetDefaultLanguageCode(prefs_lang);
+ 
+-  if (use_screen_ai_service_) {
+-    screen_ai::ScreenAIServiceRouterFactory::GetForBrowserContext(profile_)
+-        ->GetServiceStateAsync(
+-            screen_ai::ScreenAIServiceRouter::Service::kMainContentExtraction,
+-            base::BindOnce(
+-                &ReadAnythingUntrustedPageHandler::OnScreenAIServiceInitialized,
+-                weak_factory_.GetWeakPtr()));
+-#if BUILDFLAG(ENABLE_PDF)
+-    // PDF searchify feature adds OCR text to images while loading the PDF, so
+-    // warming up the OCR service is not needed.
+-    if (!base::FeatureList::IsEnabled(chrome_pdf::features::kPdfSearchify)) {
+-      screen_ai::ScreenAIServiceRouterFactory::GetForBrowserContext(profile_)
+-          ->GetServiceStateAsync(
+-              screen_ai::ScreenAIServiceRouter::Service::kOCR,
+-              base::DoNothing());
+-    }
+-#endif  // BUILDFLAG(ENABLE_PDF)
+-  }
+ 
+   // Enable accessibility for the top level render frame and all descendants.
+   // This causes AXTreeSerializer to reset and send accessibility events of
+@@ -824,12 +804,6 @@ void ReadAnythingUntrustedPageHandler::S
+           weak_factory_.GetSafeRef(), inner_contents[0], kReadAnythingAXMode);
+     }
+   }
+-  // PDF searchify feature adds OCR text to images while loading the PDF, so
+-  // activating PDF OCR is not needed.
+-  if (use_screen_ai_service_ &&
+-      !base::FeatureList::IsEnabled(chrome_pdf::features::kPdfSearchify)) {
+-    screen_ai::PdfOcrControllerFactory::GetForProfile(profile_)->Activate();
+-  }
+ #endif  // BUILDFLAG(ENABLE_PDF)
+ }
+ 
+--- a/chrome/renderer/BUILD.gn
++++ b/chrome/renderer/BUILD.gn
+@@ -370,18 +370,6 @@ static_library("renderer") {
+     ]
+   } else {
+     sources += [
+-      "accessibility/ax_tree_distiller.cc",
+-      "accessibility/ax_tree_distiller.h",
+-      "accessibility/read_anything/read_aloud_app_model.cc",
+-      "accessibility/read_anything/read_aloud_app_model.h",
+-      "accessibility/read_anything/read_aloud_traversal_utils.cc",
+-      "accessibility/read_anything/read_aloud_traversal_utils.h",
+-      "accessibility/read_anything/read_anything_app_controller.cc",
+-      "accessibility/read_anything/read_anything_app_controller.h",
+-      "accessibility/read_anything/read_anything_app_model.cc",
+-      "accessibility/read_anything/read_anything_app_model.h",
+-      "accessibility/read_anything/read_anything_node_utils.cc",
+-      "accessibility/read_anything/read_anything_node_utils.h",
+       "media/chrome_speech_recognition_client.cc",
+       "media/chrome_speech_recognition_client.h",
+       "searchbox/searchbox.cc",
+@@ -395,7 +383,6 @@ static_library("renderer") {
+       "//components/crx_file",
+       "//components/trusted_vault",
+       "//services/screen_ai/buildflags",
+-      "//services/screen_ai/public/mojom",
+       "//services/strings",
+       "//third_party/re2:re2",
+     ]
+--- a/chrome/renderer/chrome_render_frame_observer.cc
++++ b/chrome/renderer/chrome_render_frame_observer.cc
+@@ -68,7 +68,6 @@
+ #include "url/gurl.h"
+ 
+ #if !BUILDFLAG(IS_ANDROID)
+-#include "chrome/renderer/accessibility/read_anything/read_anything_app_controller.h"
+ #include "chrome/renderer/searchbox/searchbox_extension.h"
+ #endif  // !BUILDFLAG(IS_ANDROID)
+ 
+@@ -316,21 +315,6 @@ void ChromeRenderFrameObserver::DidCommi
+ }
+ 
+ void ChromeRenderFrameObserver::DidClearWindowObject() {
+-#if !BUILDFLAG(IS_ANDROID)
+-  const base::CommandLine& command_line =
+-      *base::CommandLine::ForCurrentProcess();
+-  if (command_line.HasSwitch(switches::kInstantProcess))
+-    SearchBoxExtension::Install(render_frame()->GetWebFrame());
+-
+-  // Install ReadAnythingAppController on render frames with the Read Anything
+-  // url, which is chrome-untrusted. ReadAnythingAppController installs v8
+-  // bindings in the chrome.readingMode namespace which are consumed by
+-  // read_anything/app.ts, the resource of the Read Anything WebUI.
+-  if (render_frame()->GetWebFrame()->GetDocument().Url() ==
+-      chrome::kChromeUIUntrustedReadAnythingSidePanelURL) {
+-    ReadAnythingAppController::Install(render_frame());
+-  }
+-#endif  // !BUILDFLAG(IS_ANDROID)
+ }
+ 
+ void ChromeRenderFrameObserver::DidMeaningfulLayout(
+--- a/chrome/test/BUILD.gn
++++ b/chrome/test/BUILD.gn
+@@ -2136,9 +2136,6 @@ if (!is_android) {
+       "//chrome/browser/resource_coordinator:tab_manager_features",
+       "//chrome/browser/safe_browsing:advanced_protection",
+       "//chrome/browser/safe_browsing:verdict_cache_manager_factory",
+-      "//chrome/browser/screen_ai:screen_ai_install_state",
+-      "//chrome/browser/screen_ai:screen_ai_service_router_factory",
+-      "//chrome/browser/screen_ai/public:test_support",
+       "//chrome/browser/search",
+       "//chrome/browser/search_engines",
+       "//chrome/browser/segmentation_platform:test_utils",
+@@ -2543,9 +2540,6 @@ if (!is_android) {
+       "//services/network/public/proto:sct_audit_report_proto",
+       "//services/preferences/public/cpp",
+       "//services/preferences/public/cpp/tracked",
+-      "//services/screen_ai:test_support",
+-      "//services/screen_ai/public/cpp:utilities",
+-      "//services/screen_ai/public/mojom",
+       "//services/service_manager/public/cpp",
+       "//services/strings",
+       "//services/test/echo/public/mojom",
+@@ -8033,7 +8027,6 @@ test("unit_tests") {
+ 
+     # Non-android deps for "unit_tests" target.
+     deps += [
+-      "../browser/screen_ai:screen_ai_install_state",
+       "//chrome:packed_resources_integrity_header",
+       "//chrome/browser/apps:icon_standardizer",
+       "//chrome/browser/apps/app_service",
+@@ -8176,7 +8169,6 @@ test("unit_tests") {
+       "//components/webapps/browser",
+       "//services/metrics/public/cpp:ukm_builders",
+       "//services/network:test_support",
+-      "//services/screen_ai:test_support",
+       "//services/video_effects/test:test_support",
+       "//third_party/crashpad/crashpad/util",
+       "//third_party/libaddressinput",
+@@ -8616,7 +8608,6 @@ test("unit_tests") {
+       "//chrome/browser/nearby_sharing/contacts:unit_tests",
+       "//chrome/browser/nearby_sharing/local_device_data:unit_tests",
+       "//chrome/browser/policy:unit_tests",
+-      "//chrome/browser/screen_ai:unit_tests",
+       "//chrome/browser/smart_card:unit_tests",
+       "//chrome/browser/support_tool/ash:unit_tests",
+       "//chrome/browser/ui/ash:unit_tests",
+--- a/chrome/test/chromedriver/BUILD.gn
++++ b/chrome/test/chromedriver/BUILD.gn
+@@ -408,7 +408,7 @@ source_set("lib") {
+   }
+ }
+ 
+-if (is_linux) {
++if (false) {
+   # Linux
+   executable("chromedriver_server.unstripped") {
+     testonly = true
+--- a/chrome/test/variations/BUILD.gn
++++ b/chrome/test/variations/BUILD.gn
+@@ -18,7 +18,6 @@ python_library("test_utils") {
+ 
+   data = [ "//chrome/test/variations/test_utils/" ]
+ 
+-  data_deps = [ "//third_party/catapult/third_party/gsutil:gsutil" ]
+ }
+ 
+ python_library("fixtures") {
+--- a/chrome/utility/BUILD.gn
++++ b/chrome/utility/BUILD.gn
+@@ -145,7 +145,6 @@ static_library("utility") {
+       "//chrome/common/importer:interfaces",
+       "//components/autofill/core/common",
+       "//services/proxy_resolver:lib",
+-      "//services/screen_ai",
+     ]
+   }
+ 
+--- a/chrome/utility/services.cc
++++ b/chrome/utility/services.cc
+@@ -60,8 +60,6 @@
+ #include "services/passage_embeddings/passage_embeddings_service.h"
+ #include "services/proxy_resolver/proxy_resolver_factory_impl.h"  // nogncheck
+ #include "services/proxy_resolver/public/mojom/proxy_resolver.mojom.h"
+-#include "services/screen_ai/public/mojom/screen_ai_factory.mojom.h"  // nogncheck
+-#include "services/screen_ai/screen_ai_service_impl.h"  // nogncheck
+ #endif  // !BUILDFLAG(IS_ANDROID)
+ 
+ #if BUILDFLAG(ENABLE_BROWSER_SPEECH_SERVICE)
+@@ -262,12 +260,6 @@ auto RunSpeechRecognitionService(
+ }
+ #endif  // !BUILDFLAG(ENABLE_BROWSER_SPEECH_SERVICE)
+ 
+-#if !BUILDFLAG(IS_ANDROID)
+-auto RunScreenAIServiceFactory(
+-    mojo::PendingReceiver<screen_ai::mojom::ScreenAIServiceFactory> receiver) {
+-  return std::make_unique<screen_ai::ScreenAIService>(std::move(receiver));
+-}
+-#endif
+ 
+ #if BUILDFLAG(IS_CHROMEOS_ASH)
+ auto RunCupsIppParser(
+@@ -471,7 +463,6 @@ void RegisterMainThreadServices(mojo::Se
+   services.Add(RunProfileImporter);
+   services.Add(RunMirroringService);
+   services.Add(RunPassageEmbeddingsService);
+-  services.Add(RunScreenAIServiceFactory);
+ #endif  // !BUILDFLAG(IS_ANDROID)
+ 
+ #if BUILDFLAG(ENABLE_BROWSER_SPEECH_SERVICE)
+--- a/components/omnibox/browser/autocomplete_classifier.cc
++++ b/components/omnibox/browser/autocomplete_classifier.cc
+@@ -110,8 +110,6 @@ void AutocompleteClassifier::Classify(
+     metrics::OmniboxEventProto::PageClassification page_classification,
+     AutocompleteMatch* match,
+     GURL* alternate_nav_url) {
+-  TRACE_EVENT1("omnibox", "AutocompleteClassifier::Classify", "text",
+-               base::UTF16ToUTF8(text));
+   DCHECK(!inside_classify_);
+   base::AutoReset<bool> reset(&inside_classify_, true);
+   AutocompleteInput input(text, page_classification, *scheme_classifier_);
+--- a/components/pdf/renderer/pdf_accessibility_tree.cc
++++ b/components/pdf/renderer/pdf_accessibility_tree.cc
+@@ -535,20 +535,6 @@ void PdfAccessibilityTree::SetAccessibil
+                      std::move(chars), std::move(page_objects)));
+ }
+ 
+-void PdfAccessibilityTree::OnHasSearchifyText() {
+-  // TODO(crbug.com/360803943): Look into if `render_frame()` can be null, why
+-  // it is assumed to be not null in `SetOcrCompleteStatus()`, and create a
+-  // better distinction between `render_frame()` and `render_frame_`.
+-  // TODO(accessibility): remove this dependency.
+-  content::RenderAccessibility* render_accessibility =
+-      render_frame() ? render_frame()->GetRenderAccessibility() : nullptr;
+-  bool screen_reader_mode =
+-      (render_accessibility &&
+-       render_accessibility->GetAXMode().has_mode(ui::AXMode::kScreenReader));
+-  base::UmaHistogramBoolean(
+-      "Accessibility.ScreenAI.Searchify.ScreenReaderModeEnabled",
+-      screen_reader_mode);
+-}
+ 
+ void PdfAccessibilityTree::DoSetAccessibilityPageInfo(
+     const chrome_pdf::AccessibilityPageInfo& page_info,
+--- a/components/pdf/renderer/pdf_accessibility_tree_builder.cc
++++ b/components/pdf/renderer/pdf_accessibility_tree_builder.cc
+@@ -11,7 +11,6 @@
+ #include "base/containers/fixed_flat_map.h"
+ #include "base/i18n/break_iterator.h"
+ #include "base/strings/utf_string_conversion_utils.h"
+-#include "components/pdf/renderer/pdf_ocr_helper.h"
+ #include "components/strings/grit/components_strings.h"
+ #include "pdf/accessibility_structs.h"
+ #include "pdf/pdf_features.h"
+@@ -994,8 +993,6 @@ ui::AXNodeData* PdfAccessibilityTreeBuil
+   wrapper_node->relative_bounds.bounds = gfx::RectF(position, gfx::SizeF(1, 1));
+ 
+   ui::AXNodeData* text_node = CreateStaticTextNode();
+-  text_node->SetNameChecked(l10n_util::GetStringUTF8(
+-      start ? IDS_PDF_OCR_RESULT_BEGIN : IDS_PDF_OCR_RESULT_END));
+   text_node->relative_bounds.bounds = wrapper_node->relative_bounds.bounds;
+   wrapper_node->child_ids.push_back(text_node->id);
+   return wrapper_node;
+--- a/components/pdf/renderer/pdf_view_web_plugin_client.cc
++++ b/components/pdf/renderer/pdf_view_web_plugin_client.cc
+@@ -203,34 +203,6 @@ PdfViewWebPluginClient::CreateAssociated
+   return GetFrame()->CreateAssociatedURLLoader(options);
+ }
+ 
+-void PdfViewWebPluginClient::PerformOcr(
+-    const SkBitmap& image,
+-    base::OnceCallback<void(screen_ai::mojom::VisualAnnotationPtr)> callback) {
+-  CHECK(base::FeatureList::IsEnabled(ax::mojom::features::kScreenAIOCREnabled));
+-
+-  if (!screen_ai_annotator_.is_bound()) {
+-    render_frame_->GetBrowserInterfaceBroker().GetInterface(
+-        screen_ai_annotator_.BindNewPipeAndPassReceiver());
+-    screen_ai_annotator_->SetClientType(
+-        screen_ai::mojom::OcrClientType::kPdfViewer);
+-    screen_ai_annotator_.set_disconnect_handler(
+-        base::BindOnce(&PdfViewWebPluginClient::OnOcrDisconnected,
+-                       weak_factory_.GetWeakPtr()));
+-  }
+-  screen_ai_annotator_->PerformOcrAndReturnAnnotation(image,
+-                                                      std::move(callback));
+-}
+-
+-void PdfViewWebPluginClient::SetOcrDisconnectedCallback(
+-    base::RepeatingClosure callback) {
+-  ocr_disconnect_callback_ = std::move(callback);
+-}
+-
+-void PdfViewWebPluginClient::OnOcrDisconnected() {
+-  screen_ai_annotator_.reset();
+-  CHECK(ocr_disconnect_callback_);
+-  ocr_disconnect_callback_.Run();
+-}
+ 
+ void PdfViewWebPluginClient::UpdateTextInputState() {
+   // `widget` is null in Print Preview.
+--- a/components/pdf/renderer/pdf_view_web_plugin_client.h
++++ b/components/pdf/renderer/pdf_view_web_plugin_client.h
+@@ -12,7 +12,6 @@
+ #include "base/memory/weak_ptr.h"
+ #include "mojo/public/cpp/bindings/remote.h"
+ #include "pdf/pdf_view_web_plugin.h"
+-#include "services/screen_ai/public/mojom/screen_ai_service.mojom.h"
+ 
+ namespace blink {
+ class WebLocalFrame;
+@@ -87,16 +86,10 @@ class PdfViewWebPluginClient : public ch
+       chrome_pdf::PdfAccessibilityImageFetcher* image_fetcher,
+       blink::WebPluginContainer* plugin_element,
+       bool print_preview) override;
+-  void PerformOcr(
+-      const SkBitmap& image,
+-      base::OnceCallback<void(screen_ai::mojom::VisualAnnotationPtr)> callback)
+-      override;
+-  void SetOcrDisconnectedCallback(base::RepeatingClosure callback) override;
+ 
+  private:
+   blink::WebLocalFrame* GetFrame() const;
+ 
+-  void OnOcrDisconnected();
+ 
+   const raw_ptr<content::RenderFrame> render_frame_;
+ 
+@@ -105,8 +98,6 @@ class PdfViewWebPluginClient : public ch
+ 
+   raw_ptr<blink::WebPluginContainer> plugin_container_;
+ 
+-  mojo::Remote<screen_ai::mojom::ScreenAIAnnotator> screen_ai_annotator_;
+-  base::RepeatingClosure ocr_disconnect_callback_;
+ 
+   base::WeakPtrFactory<PdfViewWebPluginClient> weak_factory_{this};
+ };
+--- a/components/update_client/BUILD.gn
++++ b/components/update_client/BUILD.gn
+@@ -339,8 +339,6 @@ source_set("unit_tests") {
+     "//third_party/puffin:libpuffpatch",
+     "//third_party/re2",
+   ]
+-
+-  data_deps = [ "//components/test/data/update_client/puffin_patch_test:puffin_patch_test_files" ]
+ }
+ 
+ fuzzer_test("update_client_protocol_serializer_fuzzer") {
+--- a/content/shell/BUILD.gn
++++ b/content/shell/BUILD.gn
+@@ -814,10 +814,6 @@ if (is_apple) {
+       deps = [ "//third_party/icu:icudata" ]
+     }
+ 
+-    if (is_mac) {
+-      sources += [ "//ui/gl/resources/angle-metal/gpu_shader_cache.bin" ]
+-    }
+-
+     if (v8_use_external_startup_data) {
+       public_deps += [ "//v8" ]
+       if (use_v8_context_snapshot) {
+--- a/pdf/accessibility.cc
++++ b/pdf/accessibility.cc
+@@ -46,7 +46,6 @@ void GetAccessibilityInfo(PDFiumEngine*
+   page_info.page_index = page_index;
+   page_info.bounds = page->rect();
+   page_info.char_count = char_count;
+-  page_info.is_searchified = page->IsPageSearchified();
+   page->GetTextAndImageInfo(text_runs, chars, page_objects.images);
+   page_info.text_run_count = text_runs.size();
+   page_objects.links = page->GetLinkInfo(text_runs);
+--- a/pdf/pdf_view_web_plugin.cc
++++ b/pdf/pdf_view_web_plugin.cc
+@@ -1326,11 +1326,6 @@ void PdfViewWebPlugin::DocumentLoadCompl
+   if (accessibility_state_ == AccessibilityState::kPending)
+     LoadAccessibility();
+ 
+-  // To avoid delaying page load for searchify, start searchify after document
+-  // load is completed.
+-  client_->SetOcrDisconnectedCallback(engine_->GetOcrDisconnectHandler());
+-  engine_->StartSearchify(
+-      base::BindRepeating(&Client::PerformOcr, client_->GetWeakPtr()));
+ 
+   if (!full_frame_)
+     return;
+@@ -2326,7 +2321,7 @@ void PdfViewWebPlugin::EnableAccessibili
+ 
+ SkBitmap PdfViewWebPlugin::GetImageForOcr(int32_t page_index,
+                                           int32_t page_object_index) {
+-  return engine_->GetImageForOcr(page_index, page_object_index);
++  return SkBitmap();
+ }
+ 
+ void PdfViewWebPlugin::HandleAccessibilityAction(
+@@ -2847,19 +2842,6 @@ void PdfViewWebPlugin::PrepareAndSetAcce
+     return;
+   }
+ 
+-  // Wait for the page to be loaded and searchified before getting accessibility
+-  // page info.
+-  // Ensure page is loaded so that it can schedule a searchify operation if
+-  // needed.
+-  engine_->GetPage(page_index)->GetPage();
+-  if (engine_->PageNeedsSearchify(page_index)) {
+-    base::SingleThreadTaskRunner::GetCurrentDefault()->PostDelayedTask(
+-        FROM_HERE,
+-        base::BindOnce(&PdfViewWebPlugin::PrepareAndSetAccessibilityPageInfo,
+-                       weak_factory_.GetWeakPtr(), page_index),
+-        kAccessibilityPageDelay * 10);
+-    return;
+-  }
+ 
+   ++next_accessibility_page_index_;
+ 
+--- a/pdf/pdfium/pdfium_engine.cc
++++ b/pdf/pdfium/pdfium_engine.cc
+@@ -2715,7 +2715,7 @@ void PDFiumEngine::HandleLongPress(const
+ 
+ SkBitmap PDFiumEngine::GetImageForOcr(int page_index, int image_index) {
+   DCHECK(PageIndexInBounds(page_index));
+-  return pages_[page_index]->GetImageForOcr(image_index);
++  return SkBitmap();
+ }
+ 
+ bool PDFiumEngine::GetPrintScaling() {
+--- a/services/passage_embeddings/passage_embeddings_service.cc
++++ b/services/passage_embeddings/passage_embeddings_service.cc
+@@ -22,7 +22,6 @@ PassageEmbeddingsService::PassageEmbeddi
+ PassageEmbeddingsService::~PassageEmbeddingsService() = default;
+ 
+ void PassageEmbeddingsService::OnEmbedderDisconnect() {
+-  embedder_.reset();
+ }
+ 
+ void PassageEmbeddingsService::LoadModels(
+--- a/services/passage_embeddings/passage_embeddings_service.h
++++ b/services/passage_embeddings/passage_embeddings_service.h
+@@ -11,7 +11,6 @@
+ 
+ namespace passage_embeddings {
+ 
+-class PassageEmbedder;
+ 
+ // Class implementation of the passage embeddings service mojo interface.
+ class PassageEmbeddingsService : public mojom::PassageEmbeddingsService {
+--- a/services/screen_ai/buildflags/features.gni
++++ b/services/screen_ai/buildflags/features.gni
+@@ -6,14 +6,13 @@ import("//build/config/sanitizers/saniti
+ 
+ declare_args() {
+   # Screen AI service is only supported on desktop platforms.
+-  enable_screen_ai_service = is_linux || is_mac || is_chromeos || is_win
++  enable_screen_ai_service = false
+ 
+   # Screen AI library is not available for browser tests on ChromeOS. Tast tests
+   # cover library's OCR functionality on ChromeOS.
+   enable_screen_ai_browsertests =
+-      is_linux || (is_mac && (target_cpu == "arm64" || target_cpu == "x64")) ||
+-      (is_win && (target_cpu == "x64" || target_cpu == "x86"))
++      false
+ 
+   # Screen AI library is not available for MSAN and UBSAN.
+-  use_fake_screen_ai = is_msan || is_ubsan || is_ubsan_vptr || is_ubsan_security
++  use_fake_screen_ai = false
+ }
+--- a/third_party/devtools-frontend/src/BUILD.gn
++++ b/third_party/devtools-frontend/src/BUILD.gn
+@@ -16,7 +16,6 @@ import("./third_party/blink/public/publi
+ devtools_frontend_resources_deps = [
+   ":favicon",
+   "front_end",
+-  "test",
+ ]
+ 
+ group("devtools_all_files") {
+--- a/third_party/devtools-frontend/src/front_end/BUILD.gn
++++ b/third_party/devtools-frontend/src/front_end/BUILD.gn
+@@ -211,7 +211,6 @@ group("unittests") {
+     "panels/timeline:unittests",
+     "panels/timeline/components:unittests",
+     "panels/timeline/components/insights:unittests",
+-    "panels/timeline/fixtures/traces",
+     "panels/timeline/overlays:unittests",
+     "panels/timeline/overlays/components:unittests",
+     "panels/timeline/track_appenders:unittests",
+--- a/third_party/devtools-frontend/src/front_end/models/trace/lantern/core/BUILD.gn
++++ b/third_party/devtools-frontend/src/front_end/models/trace/lantern/core/BUILD.gn
+@@ -38,5 +38,4 @@ ts_library("unittests") {
+     "../testing:bundle",
+   ]
+ 
+-  public_deps = [ "../../../../panels/timeline/fixtures/traces" ]
+ }
+--- a/third_party/devtools-frontend/src/front_end/models/trace/lantern/metrics/BUILD.gn
++++ b/third_party/devtools-frontend/src/front_end/models/trace/lantern/metrics/BUILD.gn
+@@ -54,5 +54,4 @@ ts_library("unittests") {
+     "../testing:bundle",
+   ]
+ 
+-  public_deps = [ "../../../../panels/timeline/fixtures/traces" ]
+ }
+--- a/third_party/devtools-frontend/src/front_end/models/trace/lantern/simulation/BUILD.gn
++++ b/third_party/devtools-frontend/src/front_end/models/trace/lantern/simulation/BUILD.gn
+@@ -51,5 +51,4 @@ ts_library("unittests") {
+     "../testing:bundle",
+   ]
+ 
+-  public_deps = [ "../../../../panels/timeline/fixtures/traces" ]
+ }
+--- a/third_party/puffin/BUILD.gn
++++ b/third_party/puffin/BUILD.gn
+@@ -115,7 +115,6 @@ executable("puffin_unittest") {
+     "src/unittest_common.cc",
+     "src/utils_unittest.cc",
+   ]
+-  data_deps = [ "//components/test/data/update_client/puffin_patch_test:puffin_patch_test_files" ]
+   deps = [
+     ":libpuffdiff",
+     ":libpuffpatch",

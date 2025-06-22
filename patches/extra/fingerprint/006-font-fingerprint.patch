@@ -1,0 +1,80 @@
+diff --git a/third_party/blink/renderer/platform/fonts/font_cache.cc b/third_party/blink/renderer/platform/fonts/font_cache.cc
+index b3a4c782c6..94b4ffbacb 100644
+--- a/third_party/blink/renderer/platform/fonts/font_cache.cc
++++ b/third_party/blink/renderer/platform/fonts/font_cache.cc
+@@ -32,14 +32,17 @@
+ #include <limits>
+ #include <memory>
+ 
++#include "base/command_line.h"
+ #include "base/debug/alias.h"
+ #include "base/feature_list.h"
+ #include "base/notreached.h"
+ #include "base/strings/escape.h"
++#include "base/strings/string_number_conversions.h"
+ #include "base/system/sys_info.h"
+ #include "base/timer/elapsed_timer.h"
+ #include "base/trace_event/process_memory_dump.h"
+ #include "base/trace_event/trace_event.h"
++#include "components/ungoogled/ungoogled_switches.h"
+ #include "build/build_config.h"
+ #include "skia/ext/font_utils.h"
+ #include "third_party/blink/public/common/features.h"
+@@ -144,6 +147,9 @@ const FontPlatformData* FontCache::SystemFontPlatformData(
+ }
+ #endif
+ 
++// TODO
++// 目前是通过减少字体生成不同的指纹
++// 后面可能会虚构一些字体，通过链接到已有字体上来实现
+ const FontPlatformData* FontCache::GetFontPlatformData(
+     const FontDescription& font_description,
+     const FontFaceCreationParams& creation_params,
+@@ -155,6 +161,47 @@ const FontPlatformData* FontCache::GetFontPlatformData(
+     PlatformInit();
+   }
+ 
++  // 获取命令行参数
++  const base::CommandLine* command_line = base::CommandLine::ForCurrentProcess();
++  if (command_line->HasSwitch(switches::kFingerprint)) {
++    // 定义基础字体列表
++    static const char* basic_fonts[] = {
++      "Arial",
++      "Times New Roman",
++      "Courier New",
++      "Georgia",
++      "Verdana",
++      // 解决中文乱码
++      "Microsoft YaHei",
++      "SimSun"
++    };
++
++    if (creation_params.CreationType() == kCreateFontByFamily) {
++      // 检查是否是基础字体
++      bool is_basic_font = false;
++      for (const char* font : basic_fonts) {
++        if (creation_params.Family() == font) {
++          is_basic_font = true;
++          break;
++        }
++      }
++
++      // 如果不是基础字体，使用fingerprint作为种子进行随机决定
++      if (!is_basic_font) {
++        // 获取fingerprint值作为种子
++        std::string fingerprint = command_line->GetSwitchValueASCII(switches::kFingerprint);
++        std::string combined = fingerprint + creation_params.Family().Utf8();
++        uint32_t hash = std::hash<std::string>{}(combined);
++        float probability = static_cast<float>(hash) / static_cast<float>(std::numeric_limits<uint32_t>::max());
++
++        // 根据概率决定是否支持该字体
++        if (probability < 0.05) {
++          return nullptr;
++        }
++      }
++    }
++  }
++
+ #if !BUILDFLAG(IS_MAC)
+   if (creation_params.CreationType() == kCreateFontByFamily &&
+       creation_params.Family() == font_family_names::kSystemUi) {

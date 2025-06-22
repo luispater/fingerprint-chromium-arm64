@@ -1,0 +1,74 @@
+--- a/build/config/compiler/BUILD.gn
++++ b/build/config/compiler/BUILD.gn
+@@ -1056,8 +1056,6 @@
+     # directory from appearing in build outputs.
+     "-Zremap-cwd-prefix=.",
+ 
+-    # We use clang-rt sanitizer runtimes.
+-    "-Zexternal-clangrt",
+   ]
+ 
+   if (!is_win || force_rustc_color_output) {
+@@ -1106,7 +1104,7 @@
+ # Don't allow unstable features to be enabled by `#![feature()]` without
+ # additional command line flags.
+ config("disallow_unstable_features") {
+-  rustflags = [ "-Zallow-features=generic_nonzero" ]
++  rustflags = [ "-Zallow-features=generic_nonzero,diagnostic_namespace" ]
+ }
+ 
+ config("libcxx_hardening") {
+--- a/third_party/crabbyavif/src/src/capi/decoder.rs
++++ b/third_party/crabbyavif/src/src/capi/decoder.rs
+@@ -19,6 +19,7 @@
+ 
+ use std::ffi::CStr;
+ use std::num::NonZero;
++use std::num::NonZeroU32;
+ use std::os::raw::c_char;
+ 
+ use crate::decoder::track::*;
+@@ -193,9 +194,9 @@
+                 // Silently treat all other choices the same as Auto.
+                 _ => CodecChoice::Auto,
+             },
+-            image_size_limit: NonZero::new(decoder.imageSizeLimit),
+-            image_dimension_limit: NonZero::new(decoder.imageDimensionLimit),
+-            image_count_limit: NonZero::new(decoder.imageCountLimit),
++            image_size_limit: NonZeroU32::new(decoder.imageSizeLimit),
++            image_dimension_limit: NonZeroU32::new(decoder.imageDimensionLimit),
++            image_count_limit: NonZeroU32::new(decoder.imageCountLimit),
+             max_threads: u32::try_from(decoder.maxThreads).unwrap_or(0),
+             android_mediacodec_output_color_format: decoder.androidMediaCodecOutputColorFormat,
+         }
+--- a/third_party/crabbyavif/src/src/decoder/mod.rs
++++ b/third_party/crabbyavif/src/src/decoder/mod.rs
+@@ -44,6 +44,7 @@
+ use std::cmp::max;
+ use std::cmp::min;
+ use std::num::NonZero;
++use std::num::NonZeroU32;
+ 
+ pub trait IO {
+     fn read(&mut self, offset: u64, max_read_size: usize) -> AvifResult<&[u8]>;
+@@ -178,9 +179,9 @@
+             allow_incremental: false,
+             image_content_to_decode: ImageContentType::ColorAndAlpha,
+             codec_choice: Default::default(),
+-            image_size_limit: NonZero::new(DEFAULT_IMAGE_SIZE_LIMIT),
+-            image_dimension_limit: NonZero::new(DEFAULT_IMAGE_DIMENSION_LIMIT),
+-            image_count_limit: NonZero::new(DEFAULT_IMAGE_COUNT_LIMIT),
++            image_size_limit: NonZeroU32::new(DEFAULT_IMAGE_SIZE_LIMIT),
++            image_dimension_limit: NonZeroU32::new(DEFAULT_IMAGE_DIMENSION_LIMIT),
++            image_count_limit: NonZeroU32::new(DEFAULT_IMAGE_COUNT_LIMIT),
+             max_threads: 1,
+             android_mediacodec_output_color_format: AndroidMediaCodecOutputColorFormat::default(),
+         }
+--- a/third_party/rust/chromium_crates_io/vendor/serde-1.0.217/src/lib.rs
++++ b/third_party/rust/chromium_crates_io/vendor/serde-1.0.217/src/lib.rs
+@@ -1,3 +1,4 @@
++#![feature(diagnostic_namespace)]
+ //! # Serde
+ //!
+ //! Serde is a framework for ***ser***ializing and ***de***serializing Rust data
+
